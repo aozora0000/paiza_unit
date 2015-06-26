@@ -1,5 +1,6 @@
 #!/bin/bash -l
 source .language
+APPNAME="$(basename ${0})"
 # TERMINAL
 RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
@@ -87,38 +88,45 @@ function clean() {
 }
 
 function new() {
-    num=${1:-"1"}
-    mkdir "${TESTDIR}/${num}" && \
-    echo > "${TESTDIR}/${num}/${CASEFILE}" && \
-    echo > "${TESTDIR}/${num}/${ANSWERFILE}" && \
-    echo "${GREEN}test directory create${NOCOLOR}"
+    testname=${1}
+    mkdir "${TESTDIR}/${testname}" && \
+    echo > "${TESTDIR}/${testname}/${CASEFILE}" && \
+    echo > "${TESTDIR}/${testname}/${ANSWERFILE}" && \
+    echo "${GREEN}test directory create ${TESTDIR}/${testname} ${NOCOLOR}"
 }
 
 function add() {
-    for dir in $TESTFILES; do
-        last=$(basename $dir)
-    done
-    new $(expr $last + 1)
+    if [ ${#1} -eq 0 ]; then
+        echo "${RED}testname is required!${NOCOLOR}"
+        usage
+    else
+        if [ -e "$TESTDIR/$1" ]; then
+            echo "${RED}\"$1\" testcase is exists!${NOCOLOR}"
+            usage
+        else
+            new $1
+        fi
+    fi
 }
 
 
 function version {
-    echo "$(basename ${0}) version ${VERSION} "
+    echo "${APPNAME} version ${VERSION} "
 }
 
 function usage() {
     cat <<EOF
 ${GREEN}
-$(basename ${0}) is a tool for testing https://paiza.jp/
+${APPNAME} is a tool for testing https://paiza.jp/
 
 version ${VERSION}
 
 Usage:
-    $(basename ${0}) [command] [<options>]
-
+    ./${APPNAME} run
+    ./${APPNAME} verbose
+    ./
 Command:
-    new               drop test cases & create new tests directory
-    add               create tests direcotory increment folder name
+    add  [testname]   create tests direcotory increment folder name
     run               run all tests
     verbose           run all tests & show results
     clean             drop test cases
@@ -135,15 +143,11 @@ case "$SUBCOMMAND" in
     verbose )
         verbose;
     ;;
-    new )
-        clean;
-        new;
-    ;;
     clean )
         clean;
     ;;
     add )
-        add
+        add ${2}
     ;;
     version|--version)
         version
