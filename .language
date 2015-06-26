@@ -1,2 +1,2 @@
 language=$(which php)
-target=app.php
+target=app.php.example
