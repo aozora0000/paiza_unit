@@ -124,7 +124,9 @@ version ${VERSION}
 Usage:
     ./${APPNAME} run
     ./${APPNAME} verbose
-    ./
+    ./${APPNAME} add example
+    ./${APPNAME} clean
+    
 Command:
     add  [testname]   create tests direcotory increment folder name
     run               run all tests
