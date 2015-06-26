@@ -1,6 +1,12 @@
 # Paiza試験用テストツール
 [https://paiza.jp](https://paiza.jp)のコーディングスキルチェック用テストツール
 
+## 動作確認環境
+- Mac OSX YOSEMITE
+- iTerm2
+- Zsh
+- PHP(スキルチェック用言語)
+
 ## 使い方
 
 ```
