@@ -11,7 +11,7 @@ CASEFILE="case.txt"
 ANSWERFILE="answer.txt"
 TESTDIR="$(pwd)/tests"
 TESTFILES="${TESTDIR}/*"
-VERSION=`git show -s --format=%H`
+VERSION=`git rev-parse --short HEAD`
 SUBCOMMAND=${1:-usage}
 
 function run() {
@@ -60,20 +60,25 @@ function add() {
 
 function usage() {
     cat <<EOF
-$(basename ${0}) is a tool for https://paiza.jp/challenges testing
+${GREEN}
+$(basename ${0}) is a tool for testing https://paiza.jp/
 
 Usage:
     $(basename ${0}) [command] [<options>]
-Command:
 
-Options:
-    --version, -v     print $(basename ${0}) version
-    --help, -h        print this
+Command:
+    new               drop test cases & create new tests directory
+    add               create tests direcotory increment folder name
+    run               run all tests
+    clean             drop test cases
+    version           print $(basename ${0}) version
+    help              print this
+${NOCOLOR}
 EOF
 }
 
 function version {
-    echo "$(basename ${0}) version 0.0.1 "
+    echo "$(basename ${0}) version ${VERSION} "
 }
 
 case "$SUBCOMMAND" in
