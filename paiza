@@ -17,7 +17,7 @@ SUBCOMMAND=${1:-usage}
 function run() {
     for dir in $TESTFILES; do
         hr
-        echo "${CYAN}TEST CASE $(basename ${dir}) by `basename ${language}` ${NOCOLOR}";
+        echo "${CYAN}TEST CASE $(basename ${dir}) by `basename ${language}` ${NOCOLOR}"
         output=`cat "${dir}/${CASEFILE}" | $language $target`
         answer=`cat ${dir}/${ANSWERFILE}`
         if [ "${output}" = "${answer}" ]; then
