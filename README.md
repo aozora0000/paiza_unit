@@ -1,6 +1,8 @@
 # Paiza試験用テストツール
 [https://paiza.jp](https://paiza.jp)のコーディングスキルチェック用テストツール
 
+![paiza](http://g.recordit.co/Niq3JFUSZe.gif)
+
 ## 動作確認環境
 - Mac OSX YOSEMITE
 - iTerm2

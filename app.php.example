@@ -1,5 +1,2 @@
 <?php
-list($n, $string) = explode(" ", trim(fgets(STDIN)));
-for($i = 0; $i < $n; $i++) {
-    echo $string.PHP_EOL;
-}
+echo "Hello World";
