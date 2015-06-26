@@ -1,0 +1,104 @@
+#!/bin/bash -l
+source .language
+RED="$(tput setaf 1)"
+GREEN="$(tput setaf 2)"
+WHITE="$(tput setaf 7)"
+CYAN="$(tput setaf 6)"
+UNDERLINE="$(tput sgr 0 1)"
+BOLD="$(tput bold)"
+NOCOLOR="$(tput sgr0)"
+CASEFILE="case.txt"
+ANSWERFILE="answer.txt"
+TESTDIR="$(pwd)/tests"
+TESTFILES="${TESTDIR}/*"
+VERSION=`git show -s --format=%H`
+SUBCOMMAND=${1:-usage}
+
+function run() {
+    for dir in $TESTFILES; do
+        hr
+        echo "${CYAN}TEST CASE $(basename ${dir}) by `basename ${language}` ${NOCOLOR}";
+        output=`cat "${dir}/${CASEFILE}" | $language $target`
+        answer=`cat ${dir}/${ANSWERFILE}`
+        if [ "${output}" = "${answer}" ]; then
+            echo "- ${GREEN}test ${dir}/case.txt success${NOCOLOR}"
+            echo "answer:"
+            echo "${answer}"
+            echo "output:"
+            echo "${output}"
+        else
+            echo "- ${RED}test ${dir}/case.txt faield case${NOCOLOR}"
+            echo "answer:"
+            echo "${answer}"
+            echo "output:"
+            echo "${output}"
+        fi
+    done
+}
+
+function clean() {
+    for dir in $TESTFILES; do
+        rm -rf $dir
+    done
+    echo "${GREEN}test cases removed${NOCOLOR}"
+}
+
+function new() {
+    num=${1:-"1"}
+    mkdir "${TESTDIR}/${num}" && \
+    echo > "${TESTDIR}/${num}/${CASEFILE}" && \
+    echo > "${TESTDIR}/${num}/${ANSWERFILE}" && \
+    echo "${GREEN}test directory create${NOCOLOR}"
+}
+
+function add() {
+    for dir in $TESTFILES; do
+        last=$(basename $dir)
+    done
+    new $(expr $last + 1)
+}
+
+function usage() {
+    cat <<EOF
+$(basename ${0}) is a tool for https://paiza.jp/challenges testing
+
+Usage:
+    $(basename ${0}) [command] [<options>]
+Command:
+
+Options:
+    --version, -v     print $(basename ${0}) version
+    --help, -h        print this
+EOF
+}
+
+function version {
+    echo "$(basename ${0}) version 0.0.1 "
+}
+
+case "$SUBCOMMAND" in
+    run )
+        run;
+    ;;
+    new )
+        clean;
+        new;
+    ;;
+    clean )
+        clean;
+    ;;
+    add )
+        add
+    ;;
+    version|--version|-v)
+        version
+    ;;
+    usage|help|--help|-h )
+        usage
+    ;;
+    *)
+        echo "[ERROR] Invalid subcommand '${1}'"
+        usage
+        exit 1
+    ;;
+esac
