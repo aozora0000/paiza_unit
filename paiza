@@ -1,5 +1,6 @@
 #!/bin/bash -l
 source .language
+# TERMINAL
 RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
 WHITE="$(tput setaf 7)"
@@ -7,6 +8,8 @@ CYAN="$(tput setaf 6)"
 UNDERLINE="$(tput sgr 0 1)"
 BOLD="$(tput bold)"
 NOCOLOR="$(tput sgr0)"
+COLS="$(tput cols)"
+
 CASEFILE="case.txt"
 ANSWERFILE="answer.txt"
 TESTDIR="$(pwd)/tests"
@@ -14,24 +17,64 @@ TESTFILES="${TESTDIR}/*"
 VERSION=`git rev-parse --short HEAD`
 SUBCOMMAND=${1:-usage}
 
+function line() {
+    while (( ${#LINE} < COLS ))
+    do
+        LINE="$LINE#"
+    done
+
+    echo "${LINE:0:$COLS}"
+}
+
 function run() {
+    failed=''
     for dir in $TESTFILES; do
-        hr
-        echo "${CYAN}TEST CASE $(basename ${dir}) by `basename ${language}` ${NOCOLOR}"
         output=`cat "${dir}/${CASEFILE}" | $language $target`
         answer=`cat ${dir}/${ANSWERFILE}`
         if [ "${output}" = "${answer}" ]; then
-            echo "- ${GREEN}test ${dir}/case.txt success${NOCOLOR}"
-            echo "answer:"
+            /bin/echo -n "."
+        else
+            /bin/echo -n "x"
+            failed="${failed},${dir}/case.txt"
+        fi
+    done
+    echo
+    if [ ${#failed} -eq 0 ]; then
+        echo "${GREEN}All Test Green${NOCOLOR}"
+    else
+        echo "${RED}Failed Any TestCase${NOCOLOR}"
+        arr=( `echo $failed | tr -s ',' ' '`)
+        for fail in $arr; do
+            echo "- $fail"
+        done
+    fi
+}
+
+function verbose() {
+    for dir in $TESTFILES; do
+        line
+        echo "# ${CYAN}TEST CASE $(basename ${dir}) by `basename ${language}` ${NOCOLOR}"
+        line
+        output=`cat "${dir}/${CASEFILE}" | $language $target`
+        answer=`cat ${dir}/${ANSWERFILE}`
+        if [ "${output}" = "${answer}" ]; then
+            echo "${GREEN}test ${dir}/case.txt success${NOCOLOR}"
+            echo
+            echo "${GREEN}- answer:${NOCOLOR}"
             echo "${answer}"
-            echo "output:"
+            echo
+            echo "${RED}- output:${NOCOLOR}"
             echo "${output}"
+            echo
         else
             echo "- ${RED}test ${dir}/case.txt faield case${NOCOLOR}"
+            echo
             echo "answer:"
             echo "${answer}"
+            echo
             echo "output:"
             echo "${output}"
+            echo
         fi
     done
 }
@@ -58,10 +101,17 @@ function add() {
     new $(expr $last + 1)
 }
 
+
+function version {
+    echo "$(basename ${0}) version ${VERSION} "
+}
+
 function usage() {
     cat <<EOF
 ${GREEN}
 $(basename ${0}) is a tool for testing https://paiza.jp/
+
+version ${VERSION}
 
 Usage:
     $(basename ${0}) [command] [<options>]
@@ -70,6 +120,7 @@ Command:
     new               drop test cases & create new tests directory
     add               create tests direcotory increment folder name
     run               run all tests
+    verbose           run all tests & show results
     clean             drop test cases
     version           print $(basename ${0}) version
     help              print this
@@ -77,13 +128,12 @@ ${NOCOLOR}
 EOF
 }
 
-function version {
-    echo "$(basename ${0}) version ${VERSION} "
-}
-
 case "$SUBCOMMAND" in
     run )
         run;
+    ;;
+    verbose )
+        verbose;
     ;;
     new )
         clean;
@@ -95,7 +145,7 @@ case "$SUBCOMMAND" in
     add )
         add
     ;;
-    version|--version|-v)
+    version|--version)
         version
     ;;
     usage|help|--help|-h )

@@ -1,3 +1,4 @@
 app.php
 tests/*
 !tests/.gitkeep
+!tests/example
